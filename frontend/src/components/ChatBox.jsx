@@ -18,7 +18,7 @@ function ChatBox() {
     setResult(null)
     try {
       const res = await axios.post(
-        'http://localhost:5000/api/ai/classify',
+        'https://biowaste-ai-backend.onrender.com/api/ai/classify',
         { description }
       )
       setResult(res.data.result)
@@ -30,7 +30,7 @@ function ChatBox() {
         .trim() || 'Unknown'
 
       await axios.post(
-        'http://localhost:5000/api/waste/log',
+        'https://biowaste-ai-backend.onrender.com/api/waste/log',
         {
           department: department,
           description: description,
