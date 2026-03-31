@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from services.gemini_service import classify_waste, get_safety_advice
 
-ai_bp = Blueprint('ai', _name_)
+ai_bp = Blueprint('ai', __name__)
 
 
 @ai_bp.route('/classify', methods=['POST'])
@@ -13,7 +13,9 @@ def classify():
         return jsonify({'error': 'No description provided'}), 400
 
     if len(description) < 5:
-        return jsonify({'error': 'Description too short'}), 400
+        return jsonify({
+            'error': 'Description too short!'
+        }), 400
 
     try:
         result = classify_waste(description)

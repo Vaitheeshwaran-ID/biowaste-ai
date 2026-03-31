@@ -1,90 +1,51 @@
-from flask import Blueprint, request, jsonify
-from models.waste_model import waste_collection
-from datetime import datetime
+import google.generativeai as genai
+from dotenv import load_dotenv
+import os
 
-waste_bp = Blueprint('waste', _name_)
+load_dotenv()
 
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-@waste_bp.route('/log', methods=['POST'])
-def log_waste():
-    data = request.get_json()
-
-    if not data:
-        return jsonify({'error': 'No data provided'}), 400
-
-    department = data.get('department', '')
-    description = data.get('description', '')
-    category = data.get('category', '')
-    quantity_kg = data.get('quantity_kg', 0)
-
-    if not department or not description or not category:
-        return jsonify({'error': 'department, description and category are required'}), 400
-
-    waste_entry = {
-        "department": department,
-        "description": description,
-        "category": category,
-        "quantity_kg": quantity_kg,
-        "date": datetime.now().isoformat(),
-        "status": "logged"
-    }
-
-    result = waste_collection.insert_one(waste_entry)
-
-    return jsonify({
-        "message": "Waste logged successfully!",
-        "id": str(result.inserted_id)
-    }), 201
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 
-@waste_bp.route('/logs', methods=['GET'])
-def get_all_logs():
-    logs = list(waste_collection.find({}, {"_id": 0}))
-    return jsonify(logs), 200
+def classify_waste(waste_description):
+    prompt = f"""
+You are a biomedical waste expert trained on CPCB
+(Central Pollution Control Board) India guidelines
+and Biomedical Waste Management Rules 2016.
+
+A hospital staff member describes this waste:
+"{waste_description}"
+
+Classify this waste and respond ONLY in this exact format:
+
+CATEGORY: (choose one: Yellow / Red / Blue / White / Black)
+BAG COLOR: (color of bag to use for disposal)
+RISK LEVEL: (choose one: High / Medium / Low)
+DISPOSAL METHOD: (exact steps to dispose this waste safely)
+PRECAUTIONS: (safety steps the staff must follow)
+COMPLIANCE NOTE: (which CPCB rule applies)
+    """
+    response = model.generate_content(prompt)
+    return response.text
 
 
-@waste_bp.route('/logs/<department>', methods=['GET'])
-def get_logs_by_department(department):
-    logs = list(waste_collection.find(
-        {"department": department},
-        {"_id": 0}
-    ))
-    return jsonify(logs), 200
+def get_safety_advice(chemical_name):
+    prompt = f"""
+You are a laboratory safety expert.
 
+A lab worker is asking about this chemical:
+"{chemical_name}"
 
-@waste_bp.route('/stats', methods=['GET'])
-def get_stats():
-    pipeline = [
-        {
-            "$group": {
-                "_id": "$category",
-                "count": {"$sum": 1},
-                "total_kg": {"$sum": "$quantity_kg"}
-            }
-        }
-    ]
-    stats = list(waste_collection.aggregate(pipeline))
+Respond ONLY in this exact format:
 
-    formatted = []
-    for s in stats:
-        formatted.append({
-            "category": s["_id"],
-            "count": s["count"],
-            "total_kg": s["total_kg"]
-        })
-
-    return jsonify(formatted), 200
-
-
-@waste_bp.route('/log/<log_id>', methods=['DELETE'])
-def delete_log(log_id):
-    from bson import ObjectId
-    result = waste_collection.delete_one({"_id": ObjectId(log_id)})
-    if result.deleted_count == 1:
-        return jsonify({"message": "Log deleted"}), 200
-    return jsonify({"error": "Log not found"}), 404
-
-
-@waste_bp.route('/test', methods=['GET'])
-def test():
-    return jsonify({"message": "Waste routes working!"}), 200
+HAZARD LEVEL: (High / Medium / Low)
+TYPE OF HAZARD: (Toxic / Flammable / Corrosive / Biohazard)
+FIRST AID: (what to do if exposed)
+PPE REQUIRED: (gloves / mask / goggles etc)
+STORAGE: (how to store safely)
+DISPOSAL: (how to dispose safely)
+    """
+    response = model.generate_content(prompt)
+    return response.text
