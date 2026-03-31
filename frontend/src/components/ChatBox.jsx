@@ -17,13 +17,14 @@ function ChatBox() {
     setResult(null)
     try {
       const res = await axios.post(
-        'http://localhost:5000/api/ai/classify',
+        'http://127.0.01:5000/api/ai/classify',
         { description }
       )
       setResult(res.data.result)
     } catch (err) {
-      setError('Backend not connected yet — that is okay for now!')
-    }
+  console.error(err);
+  setError('Error: ' + (err.response?.data?.error || err.message));
+}
     setLoading(false)
   }
 
