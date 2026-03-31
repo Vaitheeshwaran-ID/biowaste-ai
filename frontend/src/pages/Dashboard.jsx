@@ -8,7 +8,7 @@ function Dashboard() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/waste/logs')
+    axios.get('https://biowaste-ai-backend.onrender.com/api/waste/logs')
       .then(res => {
         setLogs(res.data)
         setLoading(false)
