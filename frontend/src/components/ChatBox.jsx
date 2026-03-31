@@ -3,6 +3,7 @@ import axios from 'axios'
 
 function ChatBox() {
   const [description, setDescription] = useState('')
+  const [department, setDepartment] = useState('ICU')
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -17,14 +18,31 @@ function ChatBox() {
     setResult(null)
     try {
       const res = await axios.post(
-        'http://127.0.01:5000/api/ai/classify',
+        'http://localhost:5000/api/ai/classify',
         { description }
       )
       setResult(res.data.result)
+
+      const category = res.data.result
+        .split('\n')
+        .find(line => line.startsWith('CATEGORY:'))
+        ?.replace('CATEGORY:', '')
+        .trim() || 'Unknown'
+
+      await axios.post(
+        'http://localhost:5000/api/waste/log',
+        {
+          department: department,
+          description: description,
+          category: category,
+          quantity_kg: 1
+        }
+      )
+
     } catch (err) {
-  console.error(err);
-  setError('Error: ' + (err.response?.data?.error || err.message));
-}
+      console.error(err)
+      setError('Error: ' + (err.response?.data?.error || err.message))
+    }
     setLoading(false)
   }
 
@@ -51,6 +69,30 @@ function ChatBox() {
       <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '20px' }}>
         Describe the biomedical waste — get instant CPCB disposal guidance.
       </p>
+
+      <select
+        value={department}
+        onChange={(e) => setDepartment(e.target.value)}
+        style={{
+          width: '100%',
+          padding: '10px',
+          fontSize: '14px',
+          border: '1px solid #d1d5db',
+          borderRadius: '8px',
+          marginBottom: '10px',
+          outline: 'none',
+          background: 'white'
+        }}
+      >
+        <option>ICU</option>
+        <option>Emergency</option>
+        <option>Surgery Ward</option>
+        <option>Laboratory</option>
+        <option>Pharmacy</option>
+        <option>General Ward</option>
+        <option>Maternity Ward</option>
+        <option>Pathology</option>
+      </select>
 
       <textarea
         rows={4}
@@ -132,6 +174,13 @@ function ChatBox() {
           }}>
             {result}
           </pre>
+          <p style={{
+            marginTop: '10px',
+            fontSize: '12px',
+            color: '#166534'
+          }}>
+            ✅ Waste log saved to database!
+          </p>
         </div>
       )}
 
