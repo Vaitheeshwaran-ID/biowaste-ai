@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from models.waste_model import waste_collection
 from datetime import datetime
 
-waste_bp = Blueprint('waste', _name_)
+waste_bp = Blueprint('waste', __name__)
 
 
 @waste_bp.route('/log', methods=['POST'])

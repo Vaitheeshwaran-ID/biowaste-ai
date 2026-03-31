@@ -1,12 +1,10 @@
-import google.generativeai as genai
+from google import genai
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-
-model = genai.GenerativeModel("gemini-1.5-flash")
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 
 def classify_waste(waste_description):
@@ -26,8 +24,13 @@ RISK LEVEL: (choose one: High / Medium / Low)
 DISPOSAL METHOD: (exact steps to dispose this waste safely)
 PRECAUTIONS: (safety steps the staff must follow)
 COMPLIANCE NOTE: (which CPCB rule applies)
-    """
-    response = model.generate_content(prompt)
+"""
+
+    response = client.models.generate_content(
+        model="gemini-1.5-flash",
+        contents=prompt
+    )
+
     return response.text
 
 
@@ -46,6 +49,11 @@ FIRST AID: (what to do if exposed)
 PPE REQUIRED: (gloves / mask / goggles etc)
 STORAGE: (how to store safely)
 DISPOSAL: (how to dispose safely)
-    """
-    response = model.generate_content(prompt)
+"""
+
+    response = client.models.generate_content(
+        model="gemini-1.5-flash",
+        contents=prompt
+    )
+
     return response.text

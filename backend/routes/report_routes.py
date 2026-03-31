@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from models.waste_model import waste_collection, report_collection
 from datetime import datetime
 
-report_bp = Blueprint('report', _name_)
+report_bp = Blueprint('report', __name__)
 
 
 @report_bp.route('/monthly', methods=['GET'])
