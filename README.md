@@ -143,11 +143,13 @@ MONGO_URI=your_mongodb_connection_string
 
 | Member | Role | Branch |
 |---|---|---|
-| Vaitheeshwaran | Integration + Deployment | integration |
+
 | Dhilip | Frontend Developer | frontend |
 | Madhushree | AI Agent Developer | ai |
 | Sudharsan | Backend Developer | backend |
-| M4 Name | Database Developer | database |
+| Deepak Anand | Database Developer | database |
+| HariShankar | Testing + Integration | integration |
+| Vaitheeshwaran | Deployment | Main |
 
 ---
 
