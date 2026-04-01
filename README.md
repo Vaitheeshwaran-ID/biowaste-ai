@@ -143,7 +143,6 @@ MONGO_URI=your_mongodb_connection_string
 
 | Member | Role | Branch |
 |---|---|---|
-
 | Dhilip | Frontend Developer | frontend |
 | Madhushree | AI Agent Developer | ai |
 | Sudharsan | Backend Developer | backend |
