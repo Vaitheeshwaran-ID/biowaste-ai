@@ -165,11 +165,22 @@ MONGO_URI=your_mongodb_connection_string
 
 ## 📸 Screenshots
 
-### Home Page — AI Classifier
+### 🏠 Home Page — AI Classifier
+![Home](./images/home.png)
+
 Hospital staff describes waste and gets instant CPCB guidance
 
-### Dashboard — Waste Log
+---
+
+### 📊 Dashboard — Waste Log
+![Dashboard](./images/Dashboard.png)
+
 All waste entries with department, category, quantity and date
+
+---
+
+### 📄 Output / Result
+![Output](./images/Output.png)
 
 ---
 
